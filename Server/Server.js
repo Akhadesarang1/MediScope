@@ -26,11 +26,7 @@ const io = new Server(server, { cors: { origin: "*" } });
 // -----------------------------
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://127.0.0.1:5173",
-      "https://mediscope-frontend-lxwd.onrender.com",
-    ],
+    origin: "*",
     credentials: true,
   })
 );
@@ -255,6 +251,9 @@ app.post(
 
         const response = await axios.post(`${XRAY_URL}/predict`, payload, {
           headers: { "Content-Type": "application/json" },
+          maxBodyLength: Infinity, // Critical for Base64 images
+          maxContentLength: Infinity,
+          timeout: 60000 // 60s timeout
         });
 
         microResponse = response.data;
@@ -264,7 +263,7 @@ app.post(
       // ======================================
       // 🧪 LAB REPORT HANDLER
       // ======================================
-      else if (type === "labreport" || type === "lab") {
+        } else if (type === "labreport" || type === "lab") {
         console.log("🧪 [LAB] Preparing to call Lab microservice...");
 
         const LAB_URL = process.env.LAB_URL?.replace(/\/$/, "") || "";
@@ -272,19 +271,26 @@ app.post(
         console.log("📄 Sending file path:", req.file.path);
 
         try {
-          // Using multipart/form-data for reliability
+          console.log("🔹 Creating FormData...");
           const formData = new FormData();
-          formData.append("file_path", req.file.path);
+          formData.append("files", fs.createReadStream(req.file.path));
 
-          console.log("📤 [LAB] Sending file path to microservice...");
+          console.log("📤 [LAB] Streaming file to microservice (waiting for response)...");
           const labResponse = await axios.post(`${LAB_URL}/parse`, formData, {
-            headers: formData.getHeaders(),
+            headers: {
+              ...formData.getHeaders(),
+            },
+            maxBodyLength: Infinity,
+            maxContentLength: Infinity
           });
 
+          console.log("🔹 Lab Microservice responded.");
           microResponse = labResponse.data;
-          console.log("✅ [LAB] Microservice Response:", microResponse);
+          console.log("✅ [LAB] Microservice Response Data:", JSON.stringify(microResponse));
+
         } catch (err) {
-          console.error("❌ [LAB] Microservice Error:", err.message);
+          console.error("❌ [LAB] Inner Catch - Microservice Error:", err.message);
+          console.error(err.stack); // Log stack trace
           return res
             .status(500)
             .json({ error: "Lab microservice failed", details: err.message });
