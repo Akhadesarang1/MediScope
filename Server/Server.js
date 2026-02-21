@@ -263,7 +263,7 @@ app.post(
       // ======================================
       // 🧪 LAB REPORT HANDLER
       // ======================================
-        } else if (type === "labreport" || type === "lab") {
+      else if (type === "labreport" || type === "lab") {
         console.log("🧪 [LAB] Preparing to call Lab microservice...");
 
         const LAB_URL = process.env.LAB_URL?.replace(/\/$/, "") || "";
