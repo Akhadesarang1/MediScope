@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -6,10 +5,6 @@ import Logo from "./assets/Logo.webp";
 // ========================
 // Professional Navbar
 // ========================
-
-
-
-
 const Navbar = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
