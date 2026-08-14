@@ -6,6 +6,7 @@ import Logo from "./assets/Logo.webp";
 // ========================
 // Professional Navbar
 // ========================
+
 const Navbar = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
