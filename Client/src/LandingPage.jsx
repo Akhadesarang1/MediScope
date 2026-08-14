@@ -9,6 +9,7 @@ import Logo from "./assets/Logo.webp";
 
 
 
+
 const Navbar = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
